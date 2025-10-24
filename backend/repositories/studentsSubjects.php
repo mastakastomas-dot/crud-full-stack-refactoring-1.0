@@ -13,14 +13,31 @@
 //2.0
 function getPaginatedStudentsSubjects($conn, $limit, $offset) 
 {
-    $stmt = $conn->prepare("SELECT ss.subject_id, s.name, ss.approved
-        FROM students_subjects ss
-        JOIN subjects s ON ss.subject_id = s.id
-        WHERE ss.student_id = ? LIMIT ? OFFSET ?");
+    $sql = "SELECT st.fullname AS 'Estudiante', su.name AS 'Materia',
+        CASE 
+            WHEN ss.approved = 1 THEN 'Sí'
+            ELSE 'No'
+        END AS 'Aprobado'
+    FROM 
+        students_subjects ss
+    JOIN 
+        students st ON ss.student_id = st.id
+    JOIN 
+        subjects su ON ss.subject_id = su.id
+    LIMIT ? OFFSET ?";
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+//2.0
+function getTotalStudentsSubjects($conn) 
+{
+    $sql = "SELECT COUNT(*) AS total FROM students_subjects";
+    $result = $conn->query($sql);
+    return $result->fetch_assoc()['total'];
 }
 
 function assignSubjectToStudent($conn, $student_id, $subject_id, $approved) 
