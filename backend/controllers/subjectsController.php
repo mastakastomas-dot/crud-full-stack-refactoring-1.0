@@ -37,7 +37,7 @@ function handleGet($conn)
     }
     else
     {
-        $subjects = getAllStudents($conn); // ya es array
+        $subjects = getAllSubjects($conn); // ya es array
         echo json_encode($subjects);
     }
 }
