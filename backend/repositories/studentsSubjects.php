@@ -13,18 +13,16 @@
 //2.0
 function getPaginatedStudentsSubjects($conn, $limit, $offset) 
 {
-    $sql = "SELECT st.fullname AS 'Estudiante', su.name AS 'Materia',
-        CASE 
-            WHEN ss.approved = 1 THEN 'Sí'
-            ELSE 'No'
-        END AS 'Aprobado'
-    FROM 
-        students_subjects ss
-    JOIN 
-        students st ON ss.student_id = st.id
-    JOIN 
-        subjects su ON ss.subject_id = su.id
-    LIMIT ? OFFSET ?";
+    $sql = "SELECT students_subjects.id,
+                   students_subjects.student_id,
+                   students_subjects.subject_id,
+                   students_subjects.approved,
+                   students.fullname AS student_fullname,
+                   subjects.name AS subject_name
+            FROM students_subjects
+            JOIN students ON students_subjects.student_id = students.id
+            JOIN subjects ON students_subjects.subject_id = subjects.id
+            LIMIT ? OFFSET ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();

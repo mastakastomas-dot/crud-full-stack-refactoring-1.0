@@ -21,9 +21,10 @@ const limit = 5;
 document.addEventListener('DOMContentLoaded', () => 
 {
     initSelects();
+    loadStudentsSubjects();
     setupFormHandler();
     setupCancelHandler();
-    loadRelations();
+    
     setupPaginationControls();//2.0
 });
 
@@ -81,7 +82,7 @@ function setupFormHandler()
                 await studentsSubjectsAPI.create(relation);
             }
             clearForm();
-            loadRelations();
+            loadStudentsSubjects();
         } 
         catch (err) 
         {
@@ -135,7 +136,7 @@ async function loadStudentsSubjects()
         
         const data = await studentsSubjectsAPI.fetchPaginated(currentPage, resPerPage);
         console.log(data);
-        renderStudentTable(data.studentssubjects);
+        renderRelationsTable(data.studentsSubjects);
         totalPages = Math.ceil(data.total / resPerPage);
         document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
     } 
@@ -252,7 +253,7 @@ async function confirmDelete(id)
     try 
     {
         await studentsSubjectsAPI.remove(id);
-        loadRelations();
+        loadStudentsSubjects();
     } 
     catch (err) 
     {
