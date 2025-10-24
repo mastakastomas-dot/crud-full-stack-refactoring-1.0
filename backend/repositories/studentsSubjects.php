@@ -9,6 +9,20 @@
 *    Iteration   : 3.0 ( prototype )
 */
 
+
+//2.0
+function getPaginatedStudentsSubjects($conn, $limit, $offset) 
+{
+    $stmt = $conn->prepare("SELECT ss.subject_id, s.name, ss.approved
+        FROM students_subjects ss
+        JOIN subjects s ON ss.subject_id = s.id
+        WHERE ss.student_id = ? LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
 function assignSubjectToStudent($conn, $student_id, $subject_id, $approved) 
 {
     $sql = "INSERT INTO students_subjects (student_id, subject_id, approved) VALUES (?, ?, ?)";

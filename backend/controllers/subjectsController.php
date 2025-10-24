@@ -11,18 +11,33 @@
 
 require_once("./repositories/subjects.php");
 
+// Para GET (usamos la variable superglobal $_GET):
+//https://www.php.net/manual/es/language.variables.superglobals.php
 function handleGet($conn) 
 {
-    $input = json_decode(file_get_contents("php://input"), true);
-
-    if (isset($input['id'])) 
+    if (isset($_GET['id'])) 
     {
-        $subject = getSubjectById($conn, $input['id']);
-        echo json_encode($subject);
+        $subject = getSubjectById($conn, $_GET['id']);
+        echo json_encode($Subject);
     } 
-    else 
+    //2.0
+    else if (isset($_GET['page']) && isset($_GET['limit'])) 
     {
-        $subjects = getAllSubjects($conn);
+        $page = (int)$_GET['page'];
+        $limit = (int)$_GET['limit'];
+        $offset = ($page - 1) * $limit;
+
+        $subjects = getPaginatedSubjects($conn, $limit, $offset);
+        $total = getTotalSubjects($conn);
+
+        echo json_encode([
+            'subjects' => $subjects, // ya es array
+            'total' => $total        // ya es entero
+        ]);
+    }
+    else
+    {
+        $subjects = getAllStudents($conn); // ya es array
         echo json_encode($subjects);
     }
 }
