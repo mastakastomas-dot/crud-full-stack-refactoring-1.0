@@ -45,9 +45,9 @@ function getStudentById($conn, $id)
 }
 
 function createStudent($conn, $fullname, $email, $age) 
-{
+{   // Verificamos si el nuevo email ya está en uso por otro estudiante
     if (checkEmailExists($conn, $email)) {
-        // 2. Si existe, retornamos el error
+        
         return [
             'inserted' => 0,
             'id' => null,

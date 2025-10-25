@@ -46,7 +46,7 @@ function handlePost($conn)
 
     $result = createStudent($conn, $input['fullname'], $input['email'], $input['age']);
     if(isset($result['error'])){
-        http_response_code(409); 
+        http_response_code(409); // Muestra el error especifico (email existente)
         echo json_encode(['error' => $result['error']]);
     }elseif ($result['inserted'] > 0){
     
