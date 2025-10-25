@@ -13,17 +13,25 @@ export function createAPI(moduleName, config = {})
     const API_URL = config.urlOverride ?? `../../backend/server.php?module=${moduleName}`;
 
     async function sendJSON(method, data) 
+{
+    const res = await fetch(API_URL,
     {
-        const res = await fetch(API_URL,
-        {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
 
-        if (!res.ok) throw new Error(`Error en ${method}`);
-        return await res.json();
+    // Leemos la respuesta JSON sin importar si fue un éxito o un error.
+    const responseData = await res.json(); 
+
+    if (!res.ok) {
+        // Si es un error, usamos el mensaje del backend (`responseData.error`).
+        // Si por alguna razón no viene un mensaje, usamos uno genérico como respaldo.
+        throw new Error(responseData.error || `Error en la operación ${method}`);
     }
+
+    return responseData; // Si fue exitoso, devolvemos los datos.
+}
 
     return {
         async fetchAll()

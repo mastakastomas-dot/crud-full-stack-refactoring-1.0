@@ -10,6 +10,7 @@
 
 import { studentsAPI } from '../api/studentsAPI.js';
 
+
 //For pagination:
 let currentPage = 1;
 let totalPages = 1;
@@ -22,32 +23,70 @@ document.addEventListener('DOMContentLoaded', () =>
     setupFormHandler();
     setupCancelHandler();
     setupPaginationControls();
+    setupEmailValidation();
 });
-  
+ // Actualizada 
 function setupFormHandler()
 {
     const form = document.getElementById('studentForm');
+    
+
+    const formMessageDiv = document.getElementById('formError');
+
     form.addEventListener('submit', async e => 
     {
         e.preventDefault();
+        formMessageDiv.style.display = 'none'; // Ocultamos errores viejos antes de enviar
         const student = getFormData();
     
         try 
-        {
+        {   let response;
             if (student.id) 
             {
-                await studentsAPI.update(student);
+               response =  await studentsAPI.update(student);
             } 
             else 
             {
-                await studentsAPI.create(student);
+               response =  await studentsAPI.create(student);
             }
-            clearForm();
-            loadStudents();
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+            
+            if (response.message) {
+                // Mostramos el mensaje de éxito
+                formMessageDiv.textContent = response.message;
+                formMessageDiv.classList.remove('w3-red'); // Cambiamos el color a verde
+                formMessageDiv.classList.add('w3-green');  
+                formMessageDiv.style.display = 'block';
+
+                
+                setTimeout(() => {
+                    clearForm();
+                    loadStudents();
+                    formMessageDiv.style.display = 'none'; 
+                }, 2000); //Despues de 2 segundos se oculta 
+            } else {
+                // Si no vino ningun mensaje
+                clearForm();
+                loadStudents();
+            }
         }
         catch (err)
         {
-            console.error(err.message);
+            formMessageDiv.textContent = err.message;
+            formMessageDiv.classList.remove('w3-green'); // Cambiamos el color a rojo
+            formMessageDiv.classList.add('w3-red');     
+            formMessageDiv.style.display = 'block';
+
+
+            setTimeout(() => {
+                
+                loadStudents();
+                formMessageDiv.style.display = 'none';
+            }, 5000); // Despues de 5 segundos se oculta
+            
         }
     });
 }
@@ -187,4 +226,6 @@ async function confirmDelete(id)
         console.error('Error al borrar:', err.message);
     }
 }
+
+
   

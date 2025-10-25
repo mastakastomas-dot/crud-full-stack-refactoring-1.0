@@ -46,27 +46,14 @@ function getStudentById($conn, $id)
 
 function createStudent($conn, $fullname, $email, $age) 
 {
-    // Verificamos si existe el mail
-    $checkSql = "SELECT id FROM students WHERE email = ?";
-    $checkStmt = $conn->prepare($checkSql);
-    $checkStmt->bind_param("s", $email);
-    $checkStmt->execute();
-    $checkStmt->store_result(); // Guardamos el resultado para contar las filas
-
-    // Si el número de filas encontradas es mayor a 0, el email ya existe.
-    if ($checkStmt->num_rows > 0) {
-        $checkStmt->close(); // Cierra la consulta
-        
-        // Retornamos indicando que no se insertó nada (0) y un id nulo.
-        // Podrías añadir un mensaje de error si quieres.
+    if (checkEmailExists($conn, $email)) {
+        // 2. Si existe, retornamos el error
         return [
             'inserted' => 0,
             'id' => null,
             'error' => 'El correo electrónico ya existe.'
         ];
     }
-    
-    $checkStmt->close();
 
 
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";
@@ -74,8 +61,8 @@ function createStudent($conn, $fullname, $email, $age)
     $stmt->bind_param("ssi", $fullname, $email, $age);
     $stmt->execute();
 
-    //Se retorna un arreglo con la cantidad e filas insertadas 
-    //y id insertado para validar en el controlador:
+    //Se retorna un arreglo con la cantidad de filas insertadas 
+    //e id insertado para validar en el controlador:
     return 
     [
         'inserted' => $stmt->affected_rows,        
@@ -85,6 +72,14 @@ function createStudent($conn, $fullname, $email, $age)
 
 function updateStudent($conn, $id, $fullname, $email, $age)
 {
+    // Verificamos si el nuevo email ya está en uso por otro estudiante
+    if (checkEmailExists($conn, $email, $id)) {
+        return [
+            'updated' => 0,
+            'error' => 'El correo electrónico ya está en uso por otro usuario.'
+        ];
+    }
+
     $sql = "UPDATE students SET fullname = ?, email = ?, age = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssii", $fullname, $email, $age, $id);
@@ -103,5 +98,28 @@ function deleteStudent($conn, $id)
 
     //Se retorna fila afectadas para validar en controlador
     return ['deleted' => $stmt->affected_rows];
+}
+// Nuevo: verifica si existe el email
+function checkEmailExists($conn, $email, $ignoreId = null)
+{
+    $sql = "SELECT id FROM students WHERE email = ?"; // Selecciona la id que pertenece al email
+    if ($ignoreId) { // Si se esta editando un usuario y no creando, ignoreId no es null entonces entra al if
+        $sql .= " AND id != ?"; // Verifica si hay otro estudiante que tenga ese email y su id sea distinta de la dada
+    }
+    
+    $stmt = $conn->prepare($sql);
+    
+    if ($ignoreId) { // Depende de si edita o crea, le hace bind a 1 o 2 parametros
+        $stmt->bind_param("si", $email, $ignoreId);// Edita
+    } else {
+        $stmt->bind_param("s", $email);// Crea
+    }
+    
+    $stmt->execute();
+    $stmt->store_result();
+    $exists = $stmt->num_rows > 0; // Si obtuvo un resultado mayor a uno existe el mail
+    $stmt->close();
+    
+    return $exists;
 }
 ?>
