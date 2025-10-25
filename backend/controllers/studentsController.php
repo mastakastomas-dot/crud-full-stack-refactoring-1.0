@@ -45,8 +45,11 @@ function handlePost($conn)
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = createStudent($conn, $input['fullname'], $input['email'], $input['age']);
-    if ($result['inserted'] > 0) 
-    {
+    if(isset($result['error'])){
+        http_response_code(409); // Muestra el error especifico (email existente)
+        echo json_encode(['error' => $result['error']]);
+    }elseif ($result['inserted'] > 0){
+    
         echo json_encode(["message" => "Estudiante agregado correctamente"]);
     } 
     else 
@@ -61,8 +64,11 @@ function handlePut($conn)
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = updateStudent($conn, $input['id'], $input['fullname'], $input['email'], $input['age']);
-    if ($result['updated'] > 0) 
-    {
+    if (isset($result['error'])){
+        http_response_code(409); // Muestra el error especifico (email existente)
+        echo json_encode(['error' => $result['error']]);    
+    }elseif ($result['updated'] > 0){
+        http_response_code(201);
         echo json_encode(["message" => "Actualizado correctamente"]);
     } 
     else 
