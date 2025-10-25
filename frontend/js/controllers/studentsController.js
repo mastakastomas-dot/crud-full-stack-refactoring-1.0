@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () =>
     setupFormHandler();
     setupCancelHandler();
     setupPaginationControls();
-    setupEmailValidation();
+     
 });
  // Actualizada 
 function setupFormHandler()
@@ -41,17 +41,17 @@ function setupFormHandler()
     
         try 
         {   let response;
-            if (student.id) 
+            if (student.id) // Se edita un estudiante
             {
-               response =  await studentsAPI.update(student);
+               response =  await studentsAPI.update(student); 
             } 
-            else 
+            else // Se crea un estudiante
             {
-               response =  await studentsAPI.create(student);
+               response =  await studentsAPI.create(student); 
             }
 
             if (response.error) {
-                throw new Error(response.error);
+                throw new Error(response.error); // Si hubo un error pasa a catch
             }
             
             if (response.message) {

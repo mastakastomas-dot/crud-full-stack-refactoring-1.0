@@ -39,7 +39,7 @@ function handleGet($conn)
         echo json_encode($students);
     }
 }
-
+// Actualizada
 function handlePost($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
@@ -59,6 +59,7 @@ function handlePost($conn)
     }
 }
 
+// Actualizada
 function handlePut($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
