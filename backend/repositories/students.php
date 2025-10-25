@@ -46,6 +46,29 @@ function getStudentById($conn, $id)
 
 function createStudent($conn, $fullname, $email, $age) 
 {
+    // Verificamos si existe el mail
+    $checkSql = "SELECT id FROM students WHERE email = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("s", $email);
+    $checkStmt->execute();
+    $checkStmt->store_result(); // Guardamos el resultado para contar las filas
+
+    // Si el número de filas encontradas es mayor a 0, el email ya existe.
+    if ($checkStmt->num_rows > 0) {
+        $checkStmt->close(); // Cierra la consulta
+        
+        // Retornamos indicando que no se insertó nada (0) y un id nulo.
+        // Podrías añadir un mensaje de error si quieres.
+        return [
+            'inserted' => 0,
+            'id' => null,
+            'error' => 'El correo electrónico ya existe.'
+        ];
+    }
+    
+    $checkStmt->close();
+
+
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $fullname, $email, $age);
@@ -60,7 +83,7 @@ function createStudent($conn, $fullname, $email, $age)
     ];
 }
 
-function updateStudent($conn, $id, $fullname, $email, $age) 
+function updateStudent($conn, $id, $fullname, $email, $age)
 {
     $sql = "UPDATE students SET fullname = ?, email = ?, age = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
