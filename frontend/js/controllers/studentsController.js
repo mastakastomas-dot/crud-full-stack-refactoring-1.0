@@ -225,7 +225,6 @@ async function confirmDelete(id)
          throw new Error(response.error); // Si hubo un error pasa a catch
      }
       if (response.message){
-         await studentsAPI.remove(id);
          loadStudents();
      }
     }
