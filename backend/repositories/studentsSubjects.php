@@ -104,7 +104,7 @@ function removeStudentSubject($conn, $id)
 
     return ['deleted' => $stmt->affected_rows];
 }
-function hasStudentRelations($conn, $student_id) 
+function estudiantepresente ($conn, $student_id) 
 {
     $sql = "SELECT COUNT(*) as count FROM students_subjects WHERE student_id = ?";
     $stmt = $conn->prepare($sql);
