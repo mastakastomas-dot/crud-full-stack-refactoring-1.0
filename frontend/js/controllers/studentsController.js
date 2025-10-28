@@ -220,12 +220,12 @@ async function confirmDelete(id)
     try 
     {
       let response;
-               response =  await studentsAPI.delete(id);             
-            if (response.error) {
-                throw new Error(response.error); // Si hubo un error pasa a catch
-            }
-    if (response.message){
-        await studentsAPI.remove(id);
+      response =  await studentsAPI.delete(id);             
+      if (response.error) {
+         throw new Error(response.error); // Si hubo un error pasa a catch
+     }
+      if (response.message){
+         await studentsAPI.remove(id);
          loadStudents();
      }
     }
