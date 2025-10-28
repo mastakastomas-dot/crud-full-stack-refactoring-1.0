@@ -218,12 +218,24 @@ async function confirmDelete(id)
   
     try 
     {
-        await studentsAPI.remove(id);
-        loadStudents();
+      let response;
+
+               response =  await studentsAPI.delete(student); 
+            
+
+            if (response.error) {
+                throw new Error(response.error); // Si hubo un error pasa a catch
+            }            
+     }
+    await studentsAPI.remove(id);
+    loadStudents();
     } 
     catch (err) 
     {
-        console.error('Error al borrar:', err.message);
+
+                formMessageDiv.textContent = err.message;
+                formMessageDiv.classList.add('w3-red');  
+                formMessageDiv.style.display = 'block';
     }
 }
 
