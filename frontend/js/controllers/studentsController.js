@@ -239,5 +239,3 @@ async function confirmDelete(id)
     }
 }
 
-
-  
