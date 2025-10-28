@@ -82,7 +82,12 @@ function handlePut($conn)
 function handleDelete($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
-
+    if (estudiantepresente($conn, $input['id'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "No se puede eliminar el estudiante porque está inscrito en materias"]);
+        return;
+    }
+    //Verifico si el estudiante esta presente en alguna materia
     $result = deleteStudent($conn, $input['id']);
     if ($result['deleted'] > 0) 
     {
@@ -95,5 +100,3 @@ function handleDelete($conn)
     }
 }
 ?>
-
-//Juan Cruz
