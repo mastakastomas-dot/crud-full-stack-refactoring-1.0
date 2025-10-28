@@ -91,6 +91,12 @@ function updateStudent($conn, $id, $fullname, $email, $age)
 
 function deleteStudent($conn, $id) 
 {
+    if (estudiantepresente ($conn, $id)) {
+        return [
+            'updated' => 0,
+            'error' => 'El estudiante esta presente en alguna materia'
+        ];
+    }
     $sql = "DELETE FROM students WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -121,5 +127,15 @@ function checkEmailExists($conn, $email, $ignoreId = null)
     $stmt->close();
     
     return $exists;
+}
+function estudiantepresente ($conn, $student_id) 
+{
+    $sql = "SELECT COUNT(*) as count FROM students_subjects WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['count'] > 0;
 }
 ?>

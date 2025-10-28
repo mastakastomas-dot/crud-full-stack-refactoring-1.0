@@ -214,18 +214,27 @@ function fillForm(student)
   
 async function confirmDelete(id) 
 {
-    if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;
-  
+    const formMessageDiv = document.getElementById('formError');
+   
+    if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;  
     try 
     {
-        await studentsAPI.remove(id);
-        loadStudents();
-    } 
+      let response;
+      response =  await studentsAPI.remove(id);             
+      if (response.error) {
+         throw new Error(response.error); // Si hubo un error pasa a catch
+     }
+      if (response.message){
+         loadStudents();
+     }
+    }
+   
     catch (err) 
     {
-        console.error('Error al borrar:', err.message);
+
+                formMessageDiv.textContent = err.message;
+                formMessageDiv.classList.add('w3-red');  
+                formMessageDiv.style.display = 'block';
     }
 }
 
-
-  
