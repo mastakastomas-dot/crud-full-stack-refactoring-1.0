@@ -91,7 +91,7 @@ function updateStudent($conn, $id, $fullname, $email, $age)
 
 function deleteStudent($conn, $id) 
 {
-    if (estudiantepresente ($conn, $student_id)) {
+    if (estudiantepresente ($conn, $id)) {
         return [
             'updated' => 0,
             'error' => 'El estudiante esta presente en alguna materia'
