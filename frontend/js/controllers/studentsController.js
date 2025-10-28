@@ -215,7 +215,7 @@ function fillForm(student)
 async function confirmDelete(id) 
 {
     const formMessageDiv = document.getElementById('formError');
-   {
+   
     if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;  
     try 
     {
@@ -230,7 +230,7 @@ async function confirmDelete(id)
          loadStudents();
      }
     }
-   }
+   
     catch (err) 
     {
 
