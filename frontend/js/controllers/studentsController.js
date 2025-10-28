@@ -214,15 +214,14 @@ function fillForm(student)
   
 async function confirmDelete(id) 
 {
-    if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;
-  
+    const form = document.getElementById('studentForm');
+    const formMessageDiv = document.getElementById('formError');
+   {
+    if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;  
     try 
     {
       let response;
-
-               response =  await studentsAPI.delete(student); 
-            
-
+               response =  await studentsAPI.delete(student);             
             if (response.error) {
                 throw new Error(response.error); // Si hubo un error pasa a catch
             }            
