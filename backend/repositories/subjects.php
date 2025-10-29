@@ -71,7 +71,7 @@ function updateSubject($conn, $id, $name)
 
 function deleteSubject($conn, $id) 
 {
-       if (hasSubjectRelations ($conn, $id)) {
+       if (hasSubjectRelations($conn, $id)) {
         return [
             'updated' => 0,
             'error' => 'El estudiante esta presente en alguna materia'
