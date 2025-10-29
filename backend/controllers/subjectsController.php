@@ -18,7 +18,7 @@ function handleGet($conn)
     if (isset($_GET['id'])) 
     {
         $subject = getSubjectById($conn, $_GET['id']);
-        echo json_encode($Subject);
+        echo json_encode($subject);
     } 
     //2.0
     else if (isset($_GET['page']) && isset($_GET['limit'])) 
