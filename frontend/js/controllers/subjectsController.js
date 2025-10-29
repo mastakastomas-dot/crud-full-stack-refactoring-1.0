@@ -166,7 +166,7 @@ function createSubjectActionsCell(subject)
     try 
     {
       let response;
-      response =  await SubjectsAPI.remove(id);
+      response =  await subjectsAPI.remove(id);
       if (response.error) {
          throw new Error(response.error); // Si hubo un error pasa a catch
      }
@@ -182,5 +182,4 @@ function createSubjectActionsCell(subject)
                 formMessageDiv.classList.add('w3-red');
                 formMessageDiv.style.display = 'block';
     }
-}
 }
