@@ -170,24 +170,3 @@ function existemateria ($conn, $subject_id)
     return $row['count'] > 0;
 }
 ?>
-
-    $sql = "DELETE FROM subjects WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-
-    return ['deleted' => $stmt->affected_rows];
-}
-       
-
-function hasSubjectRelations($conn, $subject_id) 
-{
-    $sql = "SELECT COUNT(*) as count FROM students_subjects WHERE subject_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $subject_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    return $row['count'] > 0;
-}
-?>
