@@ -70,13 +70,7 @@ function updateSubject($conn, $id, $name)
 }
 
 function deleteSubject($conn, $id) 
-{
-       if (hasSubjectRelations ($conn, $id)) {
-        return [
-            'updated' => 0,
-            'error' => 'El estudiante esta presente en alguna materia'
-        ];
-       }      
+{   
     $sql = "DELETE FROM subjects WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
