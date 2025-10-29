@@ -166,7 +166,7 @@ function createSubjectActionsCell(subject)
     try 
     {
       let response;
-      response =  await subjectsAPI.delete(id);
+      response =  await subjectsAPI.remove(id);
       if (response.error) {
          throw new Error(response.error); // Si hubo un error pasa a catch
      }
