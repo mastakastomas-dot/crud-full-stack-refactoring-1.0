@@ -74,7 +74,7 @@ function deleteSubject($conn, $id)
        if (hasSubjectRelations($conn, $id)) {
         return [
             'updated' => 0,
-            'error' => 'El estudiante esta presente en alguna materia'
+            'error' => 'La materia tiene al menos 1 alumno'
         ];
        }      
     $sql = "DELETE FROM subjects WHERE id = ?";
