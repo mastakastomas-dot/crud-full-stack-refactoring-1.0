@@ -158,7 +158,7 @@ function createSubjectActionsCell(subject)
     td.appendChild(deleteBtn);
     return td;
 }
-    async function confirmDelete(id) 
+    async function confirmDeleteSubject(id) 
 {
     const formMessageDiv = document.getElementById('formError');
 
@@ -166,7 +166,7 @@ function createSubjectActionsCell(subject)
     try 
     {
       let response;
-      response =  await subjectsAPI.remove(id);
+      response =  await SubjectsAPI.remove(id);
       if (response.error) {
          throw new Error(response.error); // Si hubo un error pasa a catch
      }
