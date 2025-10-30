@@ -1,4 +1,4 @@
-<?php
+r<?php
 /**
 *    File        : backend/models/subjects.php
 *    Project     : CRUD PHP
@@ -74,7 +74,7 @@ function deleteSubject($conn, $id)
        if (hasSubjectRelations($conn, $id)) {
         return [
             'updated' => 0,
-            'deleted' => 'La materia tiene al menos 1 alumno'
+            'error' => 'La materia tiene al menos 1 alumno'
         ];
        }      
     $sql = "DELETE FROM subjects WHERE id = ?";
