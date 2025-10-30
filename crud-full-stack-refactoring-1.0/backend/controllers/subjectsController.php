@@ -6,23 +6,36 @@
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Mayo 2025
 *    Status      : Prototype
-*    Iteration   : 3.0 ( prototype )
+*    Iteration   : 1.0 ( prototype )
 */
 
 require_once("./repositories/subjects.php");
 
 function handleGet($conn) 
 {
-    $input = json_decode(file_get_contents("php://input"), true);
-
-    if (isset($input['id'])) 
+    if (isset($_GET['id'])) 
     {
-        $subject = getSubjectById($conn, $input['id']);
+        $subject = getSubjectById($conn, $_GET['id']);
         echo json_encode($subject);
     } 
-    else 
+    //2.0
+    else if (isset($_GET['page']) && isset($_GET['limit'])) 
     {
-        $subjects = getAllSubjects($conn);
+        $page = (int)$_GET['page'];
+        $limit = (int)$_GET['limit'];
+        $offset = ($page - 1) * $limit;
+
+        $subjects = getPaginatedSubjects($conn, $limit, $offset);
+        $total = getTotalSubjects($conn);
+
+        echo json_encode([
+            'subjects' => $subjects,
+            'total' => $total
+    ]);
+    }
+    else
+    {
+        $subjects = getAllSubjects($conn); // ya es array
         echo json_encode($subjects);
     }
 }

@@ -8,46 +8,56 @@
 *    Iteration   : 3.0 ( prototype )
 */
 
-import { subjectsAPI } from '../api/subjectsAPI.js';
+import { subjectsAPI } from '../apiConsumers/subjectsAPI.js';
+
+//2.0
+//For pagination:
+let currentPage = 1;
+let totalPages = 1;
+const limit = 5;
+
+function showModal(title, message) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').textContent = message;
+  document.getElementById('errorModal').style.display = 'block';
+}
+
 
 document.addEventListener('DOMContentLoaded', () => 
 {
     loadSubjects();
     setupSubjectFormHandler();
     setupCancelHandler();
+    setupPaginationControls();//2.0
 });
 
-function setupSubjectFormHandler() 
-{
+function setupSubjectFormHandler() {
   const form = document.getElementById('subjectForm');
-  form.addEventListener('submit', async e => 
-  {
-        e.preventDefault();
-        const subject = 
-        {
-            id: document.getElementById('subjectId').value.trim(),
-            name: document.getElementById('name').value.trim()
-        };
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const subject = {
+      id: document.getElementById('subjectId').value.trim(),
+      name: document.getElementById('name').value.trim()
+    };
 
-        try 
-        {
-            if (subject.id) 
-            {
-                await subjectsAPI.update(subject);
-            }
-            else
-            {
-                await subjectsAPI.create(subject);
-            }
-            
-            form.reset();
-            document.getElementById('subjectId').value = '';
-            loadSubjects();
-        }
-        catch (err)
-        {
-            console.error(err.message);
-        }
+    try {
+      if (subject.id) {
+        await subjectsAPI.update(subject);
+      } else {
+        await subjectsAPI.create(subject);
+      }
+
+      form.reset();
+      document.getElementById('subjectId').value = '';
+      loadSubjects();
+    } catch (err) {
+      if (err.status === 409 && err.body?.error === "La materia ya existe") {
+        showModal("Error", "La materia ya existe. Por favor, elige otro nombre.");
+      } else {
+        showModal("Error", "No se pudo guardar la materia.");
+      }
+      console.error("Error al guardar materia:", err);
+    }
   });
 }
 
@@ -60,18 +70,56 @@ function setupCancelHandler()
     });
 }
 
-async function loadSubjects()
+
+function setupPaginationControls() 
 {
-    try
+    document.getElementById('prevPage').addEventListener('click', () => 
     {
-        const subjects = await subjectsAPI.fetchAll();
-        renderSubjectTable(subjects);
-    }
-    catch (err)
+        if (currentPage > 1) 
+        {
+            currentPage--;
+            loadSubjects();
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => 
     {
+        if (currentPage < totalPages) 
+        {
+            currentPage++;
+            loadSubjects();
+        }
+    });
+
+    document.getElementById('resultsPerPage').addEventListener('change', e => 
+    {
+        currentPage = 1;
+        loadSubjects();
+    });
+}
+
+//2.0
+async function loadSubjects() {
+    try {
+        const resPerPage = parseInt(document.getElementById('resultsPerPage').value, 10) || limit;
+        const data = await subjectsAPI.fetchPaginated(currentPage, resPerPage);
+        console.log("Respuesta del backend:", data);
+
+        if (!Array.isArray(data.subjects)) {
+            console.error("Error: 'subjects' no es un array válido", data.subjects);
+            showModal("Error", "No se pudieron cargar las materias. Verificá el servidor.");
+            return;
+        }
+
+        renderSubjectTable(data.subjects);
+        totalPages = Math.ceil(data.total / resPerPage);
+        document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
+    } catch (err) {
         console.error('Error cargando materias:', err.message);
+        showModal("Error", "Hubo un problema al cargar las materias.");
     }
 }
+
 
 function renderSubjectTable(subjects)
 {
