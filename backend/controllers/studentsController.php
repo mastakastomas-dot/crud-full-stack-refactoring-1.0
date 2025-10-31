@@ -55,7 +55,7 @@ function handlePost($conn)
     else 
     {
         http_response_code(500);
-        echo json_encode(["error" => "No se pudo agregar"]);
+        echo json_encode(["error" => "El correo electrónico ya está en uso por otro usuario."]);
     }
 }
 
@@ -74,7 +74,7 @@ function handlePut($conn)
     else 
     {
         http_response_code(500);
-        echo json_encode(["error" => "No se pudo actualizar"]);
+        echo json_encode(["error" => "El correo electrónico ya está en uso por otro usuario."]);
     }
 }
 

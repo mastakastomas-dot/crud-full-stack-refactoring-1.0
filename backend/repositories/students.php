@@ -51,7 +51,6 @@ function createStudent($conn, $fullname, $email, $age)
         return [
             'inserted' => 0,
             'id' => null,
-            'error' => 'El correo electrónico ya está en uso por otro usuario.'
         ];
     }
 
@@ -76,7 +75,6 @@ function updateStudent($conn, $id, $fullname, $email, $age)
     if (checkEmailExists($conn, $email, $id)) {
         return [
             'updated' => 0,
-            'error' => 'El correo electrónico ya está en uso por otro usuario.'
         ];
     }
 
