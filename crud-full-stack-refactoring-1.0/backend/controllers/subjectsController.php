@@ -11,33 +11,53 @@
 
 require_once("./repositories/subjects.php");
 
-function handleGet($conn) 
-{
-    $input = json_decode(file_get_contents("php://input"), true);
-
-    if (isset($input['id'])) 
-    {
-        $subject = getSubjectById($conn, $input['id']);
+function handleGet($conn) {
+    if (isset($_GET['id'])) {
+        $subject = getSubjectById($conn, $_GET['id']);
         echo json_encode($subject);
-    } 
-    else 
-    {
+    } else if (isset($_GET['page']) && isset($_GET['limit'])) {
+        $page = (int)$_GET['page'];
+        $limit = (int)$_GET['limit'];
+        $offset = ($page - 1) * $limit;
+
+        $subjects = getPaginatedSubjects($conn, $limit, $offset);
+        $total = getTotalSubjects($conn);
+
+        echo json_encode([
+            'subjects' => $subjects,
+            'total' => $total
+        ]);
+    } else {
         $subjects = getAllSubjects($conn);
-        echo json_encode($subjects);
+        echo json_encode([
+            'subjects' => $subjects,
+            'total' => count($subjects)
+        ]);
     }
 }
+
 
 function handlePost($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
+    // 1. VALIDACIÓN: Revisar si la materia ya existe
+    $existingSubject = getSubjectByName($conn, $input['name']); // Necesitas crear esta función
+
+    if ($existingSubject) {
+        // 2. Si existe, enviar el error 409 (Conflict) que el frontend espera
+        http_response_code(409); 
+        echo json_encode(["error" => "La materia ya existe"]);
+        return; // Detener la ejecución
+    }
+
+    // 3. Si no existe, crearla
     $result = createSubject($conn, $input['name']);
-    if ($result['inserted'] > 0) 
-    {
+    
+    if ($result['inserted'] > 0) {
+        http_response_code(201); // 201 (Created) es más correcto para un POST
         echo json_encode(["message" => "Materia creada correctamente"]);
-    } 
-    else 
-    {
+    } else {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo crear"]);
     }
