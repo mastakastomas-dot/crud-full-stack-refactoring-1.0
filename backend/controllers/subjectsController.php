@@ -46,13 +46,23 @@ function handlePost($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
-    $result = createSubject($conn, $input['name']);
-    if ($result['inserted'] > 0) 
-    {
+    // 1. VALIDACIÓN: Revisar si la materia ya existe
+    $existingSubject = getSubjectByName($conn, $input['name']); // Llama a la función del repositorio
+
+    if ($existingSubject) {
+        // 2. Si existe, enviar el error 409 (Conflict) que el frontend espera
+        http_response_code(409); 
+        echo json_encode(["error" => "La materia ya existe"]);
+        return; // Detener la ejecución
+    }
+
+    // 3. Si no existe, crearla
+    $result = createSubject($conn, $input['name']); // Llama a la función del repositorio
+    
+    if ($result['inserted'] > 0) {
+        http_response_code(201); // 201 (Created) es más correcto para un POST
         echo json_encode(["message" => "Materia creada correctamente"]);
-    } 
-    else 
-    {
+    } else {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo crear"]);
     }

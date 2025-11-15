@@ -46,5 +46,31 @@
     <a class="w3-btn w3-black" href="../../index.html">Volver al Panel Principal</a>
   </footer>
   
+
+
+<div id="errorModal" class="w3-modal">
+  <div class="w3-modal-content w3-card-4 w3-animate-top">
+
+    <header class="w3-container w3-red"> 
+      <span onclick="document.getElementById('errorModal').style.display='none'"
+      class="w3-button w3-display-topright">&times;</span>
+      <h2 id="modalTitle">Error</h2>
+    </header>
+
+    <div class="w3-container w3-padding">
+      <p id="modalMessage">Un error ha ocurrido.</p>
+    </div>
+
+    <footer class="w3-container w3-light-grey w3-padding">
+      <button class="w3-button w3-right w3-grey" 
+      onclick="document.getElementById('errorModal').style.display='none'">
+      Cerrar
+      </button>
+    </footer>
+
+  </div>
+</div>
+
+
 </body>
 </html>
