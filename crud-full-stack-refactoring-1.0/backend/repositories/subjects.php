@@ -59,7 +59,25 @@ function getSubjectByName($conn, $name) {
 
 function createSubject($conn, $name) 
 {
-    // Esta función solo inserta. No valida.
+    // Verificar si ya existe una materia con ese nombre
+    $checkSql = "SELECT COUNT(*) FROM subjects WHERE name = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("s", $name);
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
+
+    if ($count > 0) {
+        // Ya existe una materia con ese nombre
+        http_response_code(409); // Código de conflicto
+        echo json_encode([
+            'error' => 'La materia ya existe'
+        ]);
+        return null;
+    }
+
+    // Si no existe, proceder con el INSERT
     $sql = "INSERT INTO subjects (name) VALUES (?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $name);

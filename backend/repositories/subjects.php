@@ -16,7 +16,7 @@ function getAllSubjects($conn)
     return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
-//2.0
+
 function getPaginatedSubjects($conn, $limit, $offset) 
 {
     $stmt = $conn->prepare("SELECT * FROM subjects LIMIT ? OFFSET ?");
@@ -34,6 +34,7 @@ function getTotalSubjects($conn)
     return $result->fetch_assoc()['total'];
 }
 
+
 function getSubjectById($conn, $id) 
 {
     $sql = "SELECT * FROM subjects WHERE id = ?";
@@ -45,6 +46,7 @@ function getSubjectById($conn, $id)
     return $result->fetch_assoc(); 
 }
 
+
 function getSubjectByName($conn, $name) {
     $sql = "SELECT * FROM subjects WHERE name = ?";
     $stmt = $conn->prepare($sql);
@@ -53,16 +55,36 @@ function getSubjectByName($conn, $name) {
     return $stmt->get_result()->fetch_assoc();
 }
 
+
+
 function createSubject($conn, $name) 
 {
+    // Verificar si ya existe una materia con ese nombre
+    $checkSql = "SELECT COUNT(*) FROM subjects WHERE name = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("s", $name);
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
+
+    if ($count > 0) {
+        // Ya existe una materia con ese nombre
+        http_response_code(409); // Código de conflicto
+        echo json_encode([
+            'error' => 'La materia ya existe'
+        ]);
+        return null;
+    }
+
+    // Si no existe, proceder con el INSERT
     $sql = "INSERT INTO subjects (name) VALUES (?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $name);
     $stmt->execute();
 
-    return 
-    [
-        'inserted' => $stmt->affected_rows,        
+    return [
+        'inserted' => $stmt->affected_rows,
         'id' => $conn->insert_id
     ];
 }
