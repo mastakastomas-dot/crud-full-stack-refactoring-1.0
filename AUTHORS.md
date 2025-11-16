@@ -17,7 +17,8 @@ This project is an educational prototype of a CRUD (Create Read Update and Delet
 
 * Estudiantes de Tecnologías B - Mar del Plata (Argentina)
 
-    * Jeronimo Zalazar
-    * Juan Cruz Montes de Oca
-    * Tomas Mastakas
-    * Tomas Sacadura
+    * Many intelligent people.
+
+
+## Special thanks to
+As long as it doesn't dirty the chair =] (Mandarina)
