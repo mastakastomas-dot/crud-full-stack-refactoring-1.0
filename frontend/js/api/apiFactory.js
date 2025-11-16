@@ -8,56 +8,47 @@
 *    Iteration   : 3.0 ( prototype )
 */
 
-export function createAPI(moduleName, config = {}) 
-{
+export function createAPI(moduleName, config = {}) {
     const API_URL = config.urlOverride ?? `../../backend/server.php?module=${moduleName}`;
 
-    async function sendJSON(method, data) 
-{
-    const res = await fetch(API_URL,
-    {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    async function sendJSON(method, data) {
+        const res = await fetch(API_URL, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    // Leemos la respuesta JSON sin importar si fue un éxito o un error.
-    const responseData = await res.json(); 
+        const body = await res.json();
 
-    if (!res.ok) {
-        // Si es un error, usamos el mensaje del backend (`responseData.error`).
-        // Si por alguna razón no viene un mensaje, usamos uno genérico como respaldo.
-        throw new Error(responseData.error || `Error en la operación ${method}`);
+        if (!res.ok) {
+            const error = new Error(body.error || `Error en ${method}`);
+            error.status = res.status;
+            error.body = body;
+            throw error;
+        }
+
+        return body;
     }
 
-    return responseData; // Si fue exitoso, devolvemos los datos.
-}
-
     return {
-        async fetchAll()
-        {
+        async fetchAll() {
             const res = await fetch(API_URL);
             if (!res.ok) throw new Error("No se pudieron obtener los datos");
             return await res.json();
         },
-        async fetchPaginated(page = 1, limit = 10)
-        {
+        async fetchPaginated(page = 1, limit = 10) {
             const url = `${API_URL}&page=${page}&limit=${limit}`;
             const res = await fetch(url);
-            if (!res.ok)
-                throw new Error("Error al obtener datos paginados");
+            if (!res.ok) throw new Error("Error al obtener datos paginados");
             return await res.json();
         },
-        async create(data)
-        {
+        async create(data) {
             return await sendJSON('POST', data);
         },
-        async update(data)
-        {
+        async update(data) {
             return await sendJSON('PUT', data);
         },
-        async remove(id)
-        {
+        async remove(id) {
             return await sendJSON('DELETE', { id });
         }
     };
