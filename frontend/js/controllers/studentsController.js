@@ -237,4 +237,3 @@ async function confirmDelete(id)
                 formMessageDiv.style.display = 'block';
     }
 }
-
