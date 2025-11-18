@@ -59,12 +59,13 @@ function setupSubjectFormHandler()
       }
       catch (err)
       {
+          // ESTA ES LA LÓGICA DE VALIDACIÓN QUE FALTABA
           if (err.status === 409 && err.body?.error === "La materia ya existe") {
             showModal("Error de Validación", "La materia ya existe. Por favor, elige otro nombre.");
           } else {
             showModal("Error del Servidor", "No se pudo guardar la materia. Error: " + err.message);
           }
-          console.error(err.message); 
+          console.error(err.message); // Mantenemos el log
       }
   });
 }
