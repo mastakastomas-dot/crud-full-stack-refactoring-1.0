@@ -169,18 +169,28 @@ function createSubjectActionsCell(subject)
     td.appendChild(deleteBtn);
     return td;
 }
-
-async function confirmDeleteSubject(id)
+    async function confirmDeleteSubject(id) 
 {
-    if (!confirm('¿Seguro que deseas borrar esta materia?')) return;
+    const formMessageDiv = document.getElementById('formError');
 
-    try
+    if (!confirm('¿Estás seguro que deseas borrar esta materia?')) return;
+    try 
     {
-        await subjectsAPI.remove(id);
-        loadSubjects();
+      let response;
+      response =  await subjectsAPI.remove(id);
+      if (response.error) {
+         throw new Error(response.error); // Si hubo un error pasa a catch
+     }
+      if (response.message){
+         loadSubjects();
+     }
     }
-    catch (err)
+
+    catch (err) 
     {
-        console.error('Error al borrar materia:', err.message);
+
+                formMessageDiv.textContent = err.message;
+                formMessageDiv.classList.add('w3-red');
+                formMessageDiv.style.display = 'block';
     }
 }
