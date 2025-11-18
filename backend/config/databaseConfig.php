@@ -10,9 +10,9 @@
 */
 
 $host = "localhost";
-$user = "student";
+$user = "students_user_3";
 $password = "12345";
-$database = "students";
+$database = "students_db_3";
 
 $conn = new mysqli($host, $user, $password, $database);
 

@@ -9,35 +9,6 @@
 *    Iteration   : 3.0 ( prototype )
 */
 
-
-//2.0
-function getPaginatedStudentsSubjects($conn, $limit, $offset) 
-{
-    $sql = "SELECT students_subjects.id,
-                   students_subjects.student_id,
-                   students_subjects.subject_id,
-                   students_subjects.approved,
-                   students.fullname AS student_fullname,
-                   subjects.name AS subject_name
-            FROM students_subjects
-            JOIN students ON students_subjects.student_id = students.id
-            JOIN subjects ON students_subjects.subject_id = subjects.id
-            LIMIT ? OFFSET ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $limit, $offset);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
-
-//2.0
-function getTotalStudentsSubjects($conn) 
-{
-    $sql = "SELECT COUNT(*) AS total FROM students_subjects";
-    $result = $conn->query($sql);
-    return $result->fetch_assoc()['total'];
-}
-
 function assignSubjectToStudent($conn, $student_id, $subject_id, $approved) 
 {
     $sql = "INSERT INTO students_subjects (student_id, subject_id, approved) VALUES (?, ?, ?)";

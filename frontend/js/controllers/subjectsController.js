@@ -16,6 +16,12 @@ let currentPage = 1;
 let totalPages = 1;
 const limit = 5;
 
+function showModal(title, message) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').textContent = message;
+  document.getElementById('errorModal').style.display = 'block';
+}
+
 document.addEventListener('DOMContentLoaded', () => 
 {
     loadSubjects();
@@ -29,32 +35,37 @@ function setupSubjectFormHandler()
   const form = document.getElementById('subjectForm');
   form.addEventListener('submit', async e => 
   {
-        e.preventDefault();
-        const subject = 
-        {
-            id: document.getElementById('subjectId').value.trim(),
-            name: document.getElementById('name').value.trim()
-        };
+      e.preventDefault();
+      const subject = 
+      {
+          id: document.getElementById('subjectId').value.trim(),
+          name: document.getElementById('name').value.trim()
+      };
 
-        try 
-        {
-            if (subject.id) 
-            {
-                await subjectsAPI.update(subject);
-            }
-            else
-            {
-                await subjectsAPI.create(subject);
-            }
-            
-            form.reset();
-            document.getElementById('subjectId').value = '';
-            loadSubjects();
-        }
-        catch (err)
-        {
-            console.error(err.message);
-        }
+      try 
+      {
+          if (subject.id) 
+          {
+              await subjectsAPI.update(subject);
+          }
+          else
+          {
+              await subjectsAPI.create(subject);
+          }
+          
+          form.reset();
+          document.getElementById('subjectId').value = '';
+          loadSubjects();
+      }
+      catch (err)
+      {
+          if (err.status === 409 && err.body?.error === "La materia ya existe") {
+            showModal("Error de Validación", "La materia ya existe. Por favor, elige otro nombre.");
+          } else {
+            showModal("Error del Servidor", "No se pudo guardar la materia. Error: " + err.message);
+          }
+          console.error(err.message); 
+      }
   });
 }
 

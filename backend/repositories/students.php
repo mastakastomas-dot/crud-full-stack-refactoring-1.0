@@ -17,22 +17,6 @@ function getAllStudents($conn)
     return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
-function getPaginatedStudents($conn, $limit, $offset) 
-{
-    $stmt = $conn->prepare("SELECT * FROM students LIMIT ? OFFSET ?");
-    $stmt->bind_param("ii", $limit, $offset);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
-
-function getTotalStudents($conn) 
-{
-    $sql = "SELECT COUNT(*) AS total FROM students";
-    $result = $conn->query($sql);
-    return $result->fetch_assoc()['total'];
-}
-
 function getStudentById($conn, $id) 
 {
     $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
@@ -45,24 +29,14 @@ function getStudentById($conn, $id)
 }
 
 function createStudent($conn, $fullname, $email, $age) 
-{   // Verificamos si el nuevo email ya está en uso por otro estudiante
-    if (checkEmailExists($conn, $email)) {
-        
-        return [
-            'inserted' => 0,
-            'id' => null,
-            'error' => 'El correo electrónico ya está en uso por otro usuario.'
-        ];
-    }
-
-
+{
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $fullname, $email, $age);
     $stmt->execute();
 
-    //Se retorna un arreglo con la cantidad de filas insertadas 
-    //e id insertado para validar en el controlador:
+    //Se retorna un arreglo con la cantidad e filas insertadas 
+    //y id insertado para validar en el controlador:
     return 
     [
         'inserted' => $stmt->affected_rows,        
@@ -70,16 +44,8 @@ function createStudent($conn, $fullname, $email, $age)
     ];
 }
 
-function updateStudent($conn, $id, $fullname, $email, $age)
+function updateStudent($conn, $id, $fullname, $email, $age) 
 {
-    // Verificamos si el nuevo email ya está en uso por otro estudiante
-    if (checkEmailExists($conn, $email, $id)) {
-        return [
-            'updated' => 0,
-            'error' => 'El correo electrónico ya está en uso por otro usuario.'
-        ];
-    }
-
     $sql = "UPDATE students SET fullname = ?, email = ?, age = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssii", $fullname, $email, $age, $id);
@@ -91,12 +57,6 @@ function updateStudent($conn, $id, $fullname, $email, $age)
 
 function deleteStudent($conn, $id) 
 {
-    if (estudiantepresente ($conn, $id)) {
-        return [
-            'updated' => 0,
-            'error' => 'El estudiante esta presente en alguna materia'
-        ];
-    }
     $sql = "DELETE FROM students WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
@@ -104,38 +64,5 @@ function deleteStudent($conn, $id)
 
     //Se retorna fila afectadas para validar en controlador
     return ['deleted' => $stmt->affected_rows];
-}
-// Nuevo: verifica si existe el email
-function checkEmailExists($conn, $email, $ignoreId = null)
-{
-    $sql = "SELECT id FROM students WHERE email = ?"; // Selecciona la id que pertenece al email
-    if ($ignoreId) { // Si se esta editando un usuario y no creando, ignoreId no es null entonces entra al if
-        $sql .= " AND id != ?"; // Verifica si hay otro estudiante que tenga ese email y su id sea distinta de la dada
-    }
-    
-    $stmt = $conn->prepare($sql);
-    
-    if ($ignoreId) { // Depende de si edita o crea, le hace bind a 1 o 2 parametros
-        $stmt->bind_param("si", $email, $ignoreId);// Edita
-    } else {
-        $stmt->bind_param("s", $email);// Crea
-    }
-    
-    $stmt->execute();
-    $stmt->store_result();
-    $exists = $stmt->num_rows > 0; // Si obtuvo un resultado mayor a uno existe el mail
-    $stmt->close();
-    
-    return $exists;
-}
-function estudiantepresente ($conn, $student_id) 
-{
-    $sql = "SELECT COUNT(*) as count FROM students_subjects WHERE student_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $student_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    return $row['count'] > 0;
 }
 ?>
