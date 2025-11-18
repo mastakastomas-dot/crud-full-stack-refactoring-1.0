@@ -83,7 +83,7 @@ function setupFormHandler()
 
             setTimeout(() => {
                 
-                loadStudents();
+                
                 formMessageDiv.style.display = 'none';
             }, 5000); // Despues de 5 segundos se oculta
             
