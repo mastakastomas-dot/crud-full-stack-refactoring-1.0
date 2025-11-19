@@ -99,11 +99,28 @@ function updateSubject($conn, $id, $name)
 
 function deleteSubject($conn, $id) 
 {
+       if (hasSubjectRelations($conn, $id)) {
+        return [
+            'updated' => 0,
+            'error' => 'La materia tiene al menos 1 alumno'
+        ];
+       }      
     $sql = "DELETE FROM subjects WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
     $stmt->execute();
 
     return ['deleted' => $stmt->affected_rows];
+}
+
+function hasSubjectRelations($conn, $subject_id) 
+{
+    $sql = "SELECT COUNT(*) as count FROM students_subjects WHERE subject_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    return $row['count'] > 0;
 }
 ?>
