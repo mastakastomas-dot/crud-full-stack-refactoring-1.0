@@ -46,17 +46,28 @@ function handlePost($conn)
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
+   
+    $existingSubject = getSubjectByName($conn, $input['name']); 
+
+    if ($existingSubject) {
+        
+        http_response_code(409); 
+        echo json_encode(["error" => "La materia ya existe"]);
+        return; // Detener la ejecución
+    }
+
+    
     $result = createSubject($conn, $input['name']);
-    if ($result['inserted'] > 0) 
-    {
+    
+    if ($result['inserted'] > 0) {
+        http_response_code(201); 
         echo json_encode(["message" => "Materia creada correctamente"]);
-    } 
-    else 
-    {
+    } else {
         http_response_code(500);
         echo json_encode(["error" => "No se pudo crear"]);
     }
 }
+
 
 function handlePut($conn) 
 {
